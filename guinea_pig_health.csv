@@ -1,0 +1,11 @@
+Breed,Avg_Lifespan_Years,Skin_Disorders_Risk_Index,Claw_Disorders_Risk_Index,Dental_Disorders_Risk_Index,Respiratory_Risk_Index,Ovarian_Cysts_Risk_Index,Satin_Syndrome_Risk_Index,Most_Common_Issue
+American,5.0,2,3,2,3,2,0,Overgrown nails
+Abyssinian,4.5,4,3,2,4,2,0,Skin issues (mites)
+Peruvian,5.5,3,4,3,2,2,0,Long hair issues
+Silkie,5.5,3,4,3,2,2,0,Long hair issues
+Texel,4.0,3,4,4,3,3,0,Dental disease
+Rex,4.0,4,3,3,3,2,0,Ear wax buildup
+Skinny,3.5,5,2,2,4,3,0,Dry skin/temp sensitivity
+Coronet,5.0,3,4,3,2,2,0,Long hair issues
+Lunkarya,5.0,4,4,3,2,2,0,Long hair issues
+Satin,4.0,2,2,2,2,3,5,Satin Syndrome (bone issues)

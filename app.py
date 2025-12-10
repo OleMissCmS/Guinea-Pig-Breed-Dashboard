@@ -31,7 +31,7 @@ set_background()
 st.title("Guinea Pig Dashboard 🐹")
 
 # --- CREATE TABS ---
-tab1, tab2 = st.tabs(["📊 Breed Analysis", "🍎 Diet Analysis"])
+tab1, tab2, tab3 = st.tabs(["📊 Breed Stats", "🍎 Diet Analysis", "🩺 Health Risks"])
 
 # --- TAB 1: BREED ANALYSIS ---
 with tab1:
@@ -42,10 +42,10 @@ with tab1:
         st.error("Error: The breeds data file was not found.")
         st.stop() 
 
-    # Sidebar Filter for Tab 1
-    st.sidebar.header("Filter Breeds")
+    # Sidebar Filter for Tab 1 (Sidebar state persists across tabs by default)
+    st.sidebar.header("Filter Options")
     all_grooming = ['All'] + list(df_breeds['Grooming Needs'].unique())
-    selected_grooming = st.sidebar.selectbox("Select Grooming Needs Level", all_grooming)
+    selected_grooming = st.sidebar.selectbox("Filter Breeds by Grooming Needs", all_grooming)
 
     if selected_grooming == 'All':
         filtered_df_breeds = df_breeds
@@ -56,17 +56,9 @@ with tab1:
     st.dataframe(filtered_df_breeds) 
 
     # Visualizations
-    col1, col2 = st.columns(2)
-    with col1:
-        st.subheader("Average Weight Distribution by Breed (grams)")
-        fig_weight = px.bar(filtered_df_breeds, x='Breed', y='Average Weight (g)', color='Coat Type')
-        st.plotly_chart(fig_weight, use_container_width=True)
-
-    with col2:
-        st.subheader("Breeds by Origin Country")
-        origin_counts = df_breeds['Origin'].value_counts()
-        fig_origin = px.pie(origin_counts, values='count', names=origin_counts.index, title='Origin Country Distribution')
-        st.plotly_chart(fig_origin, use_container_width=True)
+    st.subheader("Average Weight Distribution by Breed (grams)")
+    fig_weight = px.bar(filtered_df_breeds, x='Breed', y='Average Weight (g)', color='Coat Type')
+    st.plotly_chart(fig_weight, use_container_width=True)
 
 # --- TAB 2: DIET ANALYSIS ---
 with tab2:
@@ -79,14 +71,32 @@ with tab2:
 
     st.subheader("Nutritional Breakdown of Common Foods")
     st.dataframe(df_diet)
-
-    st.subheader("Calcium vs. Phosphorus in Diet (Ca:P Ratio)")
-    st.write("A healthy ratio for guinea pigs is generally 1.5:1 to 2:1. Higher values mean high calcium.")
     
-    # Create a scatter plot for Calcium and Phosphorus
+    st.subheader("Calcium vs. Phosphorus in Diet (Ca:P Ratio)")
     fig_diet = px.scatter(df_diet, x="Calcium (mg)", y="Phosphorus (mg)", text="Food Item", 
-                          color="Category", size="Serving Size (g)",
-                          hover_name="Food Item", title="Calcium vs Phosphorus Content")
-    fig_diet.update_traces(textposition='top center')
+                          color="Category", size="Serving Size (g)", title="Calcium vs Phosphorus Content")
     st.plotly_chart(fig_diet, use_container_width=True)
+
+# --- TAB 3: HEALTH ANALYSIS ---
+with tab3:
+    st.header("Breed Health Disorder Risk Data")
+    try:
+        df_health = pd.read_csv("guinea_pig_health.csv", sep=",")
+    except FileNotFoundError:
+        st.error("Error: The health data file was not found.")
+        st.stop()
+    
+    st.dataframe(df_health)
+
+    st.subheader("Comparison of Health Risks by Breed (Index 1-5)")
+    # Melt dataframe to use plotly express for multi-bar chart
+    df_health_melted = df_health.melt(id_vars=['Breed', 'Avg_Lifespan_Years', 'Most_Common_Issue'], 
+                                      var_name='Risk_Type', value_name='Risk_Index')
+    
+    # Exclude the lifespan from the risk comparison chart
+    df_health_melted = df_health_melted[df_health_melted['Risk_Type'] != 'Avg_Lifespan_Years']
+
+    fig_health = px.bar(df_health_melted, x="Breed", y="Risk_Index", color="Risk_Type", 
+                        barmode="group", title="Comparative Health Risk Indices (Higher is worse)")
+    st.plotly_chart(fig_health, use_container_width=True)
 
